@@ -15,7 +15,7 @@ class CreateAggregationRatingsTable extends Migration
     {
         Schema::create('aggregation_ratings', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
+            $table->decimal('score_avg', 2, 1);
         });
     }
 
