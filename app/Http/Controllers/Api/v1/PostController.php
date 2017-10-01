@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\AggregationRating;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Author;
@@ -51,6 +52,26 @@ class PostController extends Controller
         return response()->json(['status' => 'success', 'params' => $request->all()], 200);
     }
 
+    public function getPostsByScoreAvg(Request $request)
+    {
+        if (!$this->isScoreCorrect($request)) {
+            return response()->json(['status' => 'error', 'messages' => $this->errors], 400);
+        }
+
+        $scoreAvg = $request->score_avg;
+        $arrPostIds = AggregationRating::getPostsIdByScoreAvg($scoreAvg);
+
+        if (!Post::getArrPostsById($arrPostIds)->isEmpty()) {
+            $key = 'posts';
+            $result = Post::getArrPostsById($arrPostIds);
+        } else {
+            $key = 'message';
+            $result = ["Постов с рейтингом $scoreAvg не найдено."];
+        }
+
+        return response()->json(['status' => 'success', $key => $result], 200);
+    }
+
     /**
      * Проверка реквеста на предмет обязательных полей
      * @param Request $request
@@ -68,5 +89,14 @@ class PostController extends Controller
             $this->errors[] = 'Не получено поле login';
         }
         return (empty($this->errors)) ? true : false;
+    }
+
+    protected function isScoreCorrect(Request $request)
+    {
+        if (!is_numeric($request->score_avg) || $request->score_avg < 1 || $request->score_avg > 5) {
+            $this->errors[] = "Установлено недопустимое значение.";
+            return false;
+        }
+        return true;
     }
 }

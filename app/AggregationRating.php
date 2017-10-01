@@ -40,4 +40,13 @@ class AggregationRating extends Model
             if (isset($rating->post_id)) self::calcScoreAvgPost($rating->post_id);
         }
     }
+
+    public static function getPostsIdByScoreAvg($scoreAvg): array
+    {
+        $arrPostIds = DB::table('aggregation_ratings')
+            ->where('score_avg', $scoreAvg)
+            ->pluck('post_id')
+            ->toArray();
+        return $arrPostIds;
+    }
 }

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Post extends Model
 {
@@ -19,5 +20,10 @@ class Post extends Model
     public function getPostById($id)
     {
         return $this::find($id);
+    }
+
+    public static function getArrPostsById(array $postIds)
+    {
+        return DB::table('posts')->select('title', 'description')->whereIn('id', $postIds)->get();
     }
 }

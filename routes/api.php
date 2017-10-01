@@ -19,5 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'v1'], function () {
     Route::any('addPost', 'Api\v1\PostController@create');
+    Route::any('getPostsByScoreAvg', 'Api\v1\PostController@getPostsByScoreAvg');
     Route::any('setRatingPost', 'Api\v1\RatingController@setRate');
 });
