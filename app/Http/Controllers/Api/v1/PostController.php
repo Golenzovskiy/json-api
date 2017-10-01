@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\AggregationRating;
+use App\Helpers\Api\Helper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Author;
@@ -14,7 +15,7 @@ class PostController extends Controller
      * Массив сообщений об ошибках
      * @var array
      */
-    protected $errors = [];
+    public $errors = [];
 
     /**
      * Добавление нового поста
@@ -23,7 +24,7 @@ class PostController extends Controller
      */
     public function create(Request $request)
     {
-        if (!$this->checkRequireFields($request)) {
+        if (!Helper::checkRequireFields($this, $request->all(), ['title', 'description', 'login'])) {
             return response()->json(['status' => 'error', 'messages' => $this->errors], 422);
         }
         
@@ -54,7 +55,7 @@ class PostController extends Controller
 
     public function getPostsByScoreAvg(Request $request)
     {
-        if (!$this->isScoreCorrect($request)) {
+        if (!Helper::isScoreCorrect($this, $request->score_avg)) {
             return response()->json(['status' => 'error', 'messages' => $this->errors], 400);
         }
 
@@ -70,33 +71,5 @@ class PostController extends Controller
         }
 
         return response()->json(['status' => 'success', $key => $result], 200);
-    }
-
-    /**
-     * Проверка реквеста на предмет обязательных полей
-     * @param Request $request
-     * @return bool false, если проверка не прошла
-     */
-    protected function checkRequireFields(Request $request)
-    {
-        if (!isset($request->title)) {
-            $this->errors[] = 'Не получено поле title';
-        }
-        if (!isset($request->description)) {
-            $this->errors[] = 'Не получено поле description';
-        }
-        if (!isset($request->login)) {
-            $this->errors[] = 'Не получено поле login';
-        }
-        return (empty($this->errors)) ? true : false;
-    }
-
-    protected function isScoreCorrect(Request $request)
-    {
-        if (!is_numeric($request->score_avg) || $request->score_avg < 1 || $request->score_avg > 5) {
-            $this->errors[] = "Установлено недопустимое значение.";
-            return false;
-        }
-        return true;
     }
 }
