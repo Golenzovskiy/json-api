@@ -32,8 +32,7 @@ class RatingController extends Controller
             $rating->score = $request->score;
             $rating->save();
 
-            $aggregation = new AggregationRating();
-            $scoreAvg = $aggregation->reCalcScoreAvg($request->post_id);
+            $scoreAvg = AggregationRating::calcScoreAvgPost($request->post_id);
         } catch (\Exception $exception) {
             return response()->json(['status' => 'error', 'messages' => [$exception->getMessage()]], 520);
         }

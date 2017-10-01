@@ -3,12 +3,13 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class AggregationRating extends Model
 {
     public $timestamps = false;
 
-    public function reCalcScoreAvg(int $postId)
+    public static function calcScoreAvgPost(int $postId)
     {
         $rating = new Rating();
         $postRatings = $rating->where('post_id', $postId)->get();
@@ -20,7 +21,7 @@ class AggregationRating extends Model
         }
         $scoreAvg = $sum / $count;
 
-        if ($aggregation = $this->where('post_id', $postId)->first()) {
+        if ($aggregation = self::where('post_id', $postId)->first()) {
             $aggregation->score_avg = $scoreAvg;
             $aggregation->save();
         } else {
@@ -30,5 +31,13 @@ class AggregationRating extends Model
             $aggregation->save();
         }
         return $aggregation->score_avg;
+    }
+
+    public static function calcScoreAvgAllPosts()
+    {
+        $collection = DB::table('ratings')->select('post_id')->groupBy('post_id')->get();
+        foreach ($collection as $rating) {
+            if (isset($rating->post_id)) self::calcScoreAvgPost($rating->post_id);
+        }
     }
 }

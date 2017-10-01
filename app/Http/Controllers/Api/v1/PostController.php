@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\v1;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Author;
 use App\Post;
@@ -17,7 +16,7 @@ class PostController extends Controller
     protected $errors = [];
 
     /**
-     * Добалвение нового поста
+     * Добавление нового поста
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
